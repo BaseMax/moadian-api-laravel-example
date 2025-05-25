@@ -102,6 +102,14 @@ Route::get('/test-moadian', function () {
 - Laravel 10+
 - [jooyeshgar/moadian](https://github.com/Jooyeshgar/moadian)
 
+## Manual PHP Version
+
+👉 [Manual PHP Version (Without Laravel)](https://github.com/BaseMax/moadian-api-example)
+
+If you prefer not to use Laravel or any Laravel-specific packages and want to see a pure PHP implementation of the Moadian API integration, you can check out the following repository:
+
+This alternative project demonstrates how to handle the Moadian API in plain PHP using minimal dependencies. It's ideal for educational purposes, small scripts, or custom non-framework projects.
+
 ## 🪪 License
 
 MIT License © 2025 [Max Base](https://github.com/BaseMax)
