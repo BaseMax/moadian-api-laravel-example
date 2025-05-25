@@ -1,61 +1,107 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Moadian API Laravel Example
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a simple example Laravel project demonstrating how to use the [`jooyeshgar/moadian`](https://github.com/Jooyeshgar/moadian) PHP package for integrating with Iran's national tax system (سامانه مودیان).
 
-## About Laravel
+> ⚠️ **Note**: This is a test project and should not be used in production without proper validation, error handling, and security hardening.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🔧 Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Demonstrates basic usage of the `jooyeshgar/moadian` package
+- Retrieves:
+  - A server nonce via the Moadian API
+  - Server info
+- Basic error handling for API responses
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📁 Project Structure
 
-## Learning Laravel
+This example is built on top of a fresh Laravel installation and adds a sample route at `/test-moadian` that interacts with the سامانه مودیان.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🧪 How It Works
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+The `/test-moadian` route initializes the Moadian client using your private key, certificate, and base API URL. It then sends two test requests:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. `getNonce()`: Gets a unique one-time token from the tax system.
+2. `getServerInfo()`: Fetches server information.
 
-## Laravel Sponsors
+The route returns both responses as JSON.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Setup Instructions
 
-### Premium Partners
+1. **Clone the Repository**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+   ```bash
+   git clone https://github.com/BaseMax/moadian-api-laravel-example.git
+   cd moadian-api-laravel-example
+   ```
 
-## Contributing
+2. **Install Dependencies**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+   ```bash
+   composer install
+   ```
 
-## Code of Conduct
+3. **Generate Application Key**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   ```bash
+   php artisan key:generate
+   ```
 
-## Security Vulnerabilities
+4. **Configure Environment**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   Copy `.env.example` to `.env` and configure the following:
 
-## License
+   ```dotenv
+   MOADIAN_USERNAME=xxxxxxxxxxx
+   TAXID=xxxxxxxxxxx
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+   Also ensure your private key and certificate files are placed in:
+
+   ```
+   storage/app/keys/private.pem
+   storage/app/keys/certificate.crt
+   ```
+
+5. **Serve the Application**
+
+   ```bash
+   php artisan serve
+   ```
+
+6. **Test the Endpoint**
+
+   Visit:
+
+   ```
+   http://localhost:8000/test-moadian
+   ```
+
+## 📄 Example Route
+
+This is the key route defined in `routes/web.php`:
+
+```php
+Route::get('/test-moadian', function () {
+    try {
+        $privateKey = file_get_contents(__DIR__.'/../storage/app/keys/private.pem');
+        $certificate = file_get_contents(__DIR__.'/../storage/app/keys/certificate.crt');
+        $base_url = 'https://tp.tax.gov.ir/requestsmanager/api/v2/';
+        $moadian = new Moadian($privateKey, $certificate, $base_url);
+        $nonce = $moadian->getNonce();
+        $info = $moadian->getServerInfo();
+        return response()->json([$nonce, $info]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+```
+
+## 📦 Dependencies
+
+- PHP 8.1+
+- Laravel 10+
+- [jooyeshgar/moadian](https://github.com/Jooyeshgar/moadian)
+
+## 🪪 License
+
+MIT License © 2025 [Max Base](https://github.com/BaseMax)
