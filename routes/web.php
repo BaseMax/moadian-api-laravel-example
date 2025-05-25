@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 // use Jooyeshgar\Moadian\Facades\Moadian;
 use Jooyeshgar\Moadian\Moadian;
